@@ -20,6 +20,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore src\ObjDiff.sln
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore src\ObjDiff\ObjDiff.csproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal src\Tests\Tests.csproj
