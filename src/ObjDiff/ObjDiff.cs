@@ -11,19 +11,19 @@ namespace ObjDiff
 {
   public class ObjDiff
   {
-    public static IEnumerable<Difference> Diff<T>(T object1, T object2, CompareOptions compareOptions = null) where T : class
+    public static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions = null) where T : class
     {
-      return Diff(object1, object2, compareOptions, null, null, 1);
+      return Diff(left, right, compareOptions, null, null, 1);
     }
 
 
-    public static void Patch<T>(T obj, IEnumerable<Difference> differences) where T : class
+    public static void Patch<T>(T target, IEnumerable<Difference> differences) where T : class
     {
       foreach (var difference in differences)
       {
         var singleProperties = difference.Path.Split('.');
-        object objAux = obj;
-        int i = 0;
+        object objAux = target;
+        var i = 0;
 
         while (i < singleProperties.Length - 1)
         {
@@ -56,6 +56,7 @@ namespace ObjDiff
         {
           var collection = property.GetValue(objAux);
 
+          // For those collections implementing IList, missing/extra items can be directly added/deleted.
           if (collection is IList list)
           {
             if (Equals(difference.LeftValue, ItemStatus.NotExist))
@@ -65,6 +66,7 @@ namespace ObjDiff
               list.Remove(difference.LeftValue);
           }
 
+          // If not, the collection will be replaced with a new one with the affected items already added/removed.
           else
           {
             var mutableList = (property.GetValue(objAux) as IEnumerable<object>).ToList();
@@ -85,28 +87,26 @@ namespace ObjDiff
     }
 
 
-    private static IEnumerable<Difference> Diff<T>(T object1, T object2, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
+    private static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
     {
+      var differences = new List<Difference>();
+
+      if ((left == null) && (right == null))
+        return differences;
+
       if (compareOptions == null)
         compareOptions = new CompareOptions();
 
-      var differences = new List<Difference>();
-
-      /*
-      if (IsSimpleType(typeof(T)))
-      {
-          if (!Equals(object1, object2))
-              diffs.Add(new Difference())
-      }
-      */
-
-      var applicableProperties = object1.GetType().GetProperties().Where(p => !compareOptions.IgnoredProperties.Contains(p.Name) &&
+      var applicableProperties = left.GetType().GetProperties().Where(p => !compareOptions.IgnoredProperties.Contains(p.Name) &&
           !p.GetCustomAttributes(false).Any(x => compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
 
       foreach (var property in applicableProperties)
       {
-        var value1 = property.GetValue(object1);
-        var value2 = property.GetValue(object2);
+        var value1 = property.GetValue(left);
+        var value2 = property.GetValue(right);
+
+        if ((value1 == null) && (value2 == null))
+          continue;
 
         if (string.IsNullOrEmpty(path) && (arrayIndex != null))
           throw new Exception("Array index specified while in root path");
@@ -116,23 +116,17 @@ namespace ObjDiff
 
         if (IsCollection(property))
         {
-          var collection1 = (IEnumerable<object>)value1;
-          var collection2 = (IEnumerable<object>)value2;
+          var collectionType = property.PropertyType.IsArray ? property.PropertyType : property.PropertyType.GetGenericArguments()[0];
+
+          var collection1 = (value1 as IEnumerable)?.OfType<object>() ?? new List<object>();
+          var collection2 = (value2 as IEnumerable)?.OfType<object>() ?? new List<object>();
 
           var collection1Count = collection1.Count();
           var collection2Count = collection2.Count();
-
-          /*
-          if (!compareOptions.CollectionsSameOrder)
-          {
-              collection1 = collection1.OrderBy(item => item);
-              collection2 = collection2.OrderBy(item => item);
-          }
-          */
-
+        
           if (collection1Count == collection2Count)
           {
-            if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth))
+            if (IsSimpleType(collectionType) || collectionType.IsArray || (currentDepth == compareOptions.MaxDepth))
             {
               if (compareOptions.CollectionsSameOrder)
               {
@@ -142,7 +136,7 @@ namespace ObjDiff
                   var collection2Value = collection2.ElementAt(i);
 
                   if (!Equals(collection1Value, collection2Value))
-                    differences.Add(new Difference(propertyPath, collection1Value, collection2Value));
+                    differences.Add(new Difference($"{propertyPath}[{i}]", collection1Value, collection2Value));
                 }
               }
 
@@ -183,13 +177,10 @@ namespace ObjDiff
 
           else
           {
-            // Esto vale para el caso CollectionsSameOrder = true. Si no se va a tener en cuenta el orden, y aunque se hayan ordenado las listas,
-            // por cada elemento habría que comprobar si la otra lista lo contiene (método Contains).
-
             var minItems = Math.Min(collection1Count, collection2Count);
             var maxItems = Math.Max(collection1Count, collection2Count);
 
-            if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth))
+            if (IsSimpleType(collectionType) || collectionType.IsArray || (currentDepth == compareOptions.MaxDepth))
             {
               if (compareOptions.CollectionsSameOrder)
               {
@@ -199,7 +190,7 @@ namespace ObjDiff
                   var collection2Value = collection2.ElementAt(i);
 
                   if (!Equals(collection1Value, collection2Value))
-                    differences.Add(new Difference(propertyPath, collection1Value, collection2Value));
+                    differences.Add(new Difference($"{propertyPath}[{i}]", collection1Value, collection2Value));
                 }
 
                 if (minItems == collection1Count)
@@ -223,17 +214,7 @@ namespace ObjDiff
 
               else
               {
-                if (maxItems == collection1Count)
-                {
-                  var notInCollection2 = collection1.Except(collection2).ToList();
-
-                  /*
-                  foreach (var item in notInCollection2)
-                  {
-                      differences.Add(new Difference( ))
-                  }
-                  */
-                }
+                throw new NotImplementedException();
               }
             }
 
@@ -316,7 +297,6 @@ namespace ObjDiff
     {
       return propertyInfo.PropertyType != typeof(string) &&
              propertyInfo.PropertyType.GetInterface(nameof(IEnumerable)) != null;
-
     }
 
 
