@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <BaseIntermediateOutputPath>..\obj\</BaseIntermediateOutputPath>
-    <OutputPath>..\bin\</OutputPath>
+    <BaseIntermediateOutputPath>..\..\obj\ObjDiff\</BaseIntermediateOutputPath>
+    <OutputPath>..\..\bin\ObjDiff\</OutputPath>
   </PropertyGroup>
 </Project>
