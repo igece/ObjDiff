@@ -22,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore src\ObjDiff\ObjDiff.csproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal src\Tests\Tests.csproj
+      run: dotnet test --no-restore --verbosity normal src\Tests\Tests.csproj
