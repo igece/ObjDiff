@@ -2,6 +2,22 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Company>igece.labs</Company>
+    <PackageProjectUrl>http://github.com/igece/ObjDiff</PackageProjectUrl>
+    <RepositoryUrl>http://github.com/igece/ObjDiff</RepositoryUrl>
+    <PackageTags>diff patch object differences</PackageTags>
+    <Authors>igece.labs</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\README.md" Link="README.md" />
+  </ItemGroup>
 
 </Project>
