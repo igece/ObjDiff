@@ -9,7 +9,9 @@
     <PackageProjectUrl>http://github.com/igece/ObjDiff</PackageProjectUrl>
     <RepositoryUrl>http://github.com/igece/ObjDiff</RepositoryUrl>
     <PackageTags>diff patch object differences</PackageTags>
-    <Authors>igece.labs</Authors>
+    <Authors>Israel Gómez de Celis González</Authors>
+    <Description>A C# .NET Standard library that allows to obtain the differences between two objects and, optionally, patch the first object with these differences so it becomes equal to the second one.</Description>
+    <Copyright>Copyright (c) 2021 Israel Gómez de Celis González</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
