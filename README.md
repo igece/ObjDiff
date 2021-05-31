@@ -40,7 +40,7 @@ The above limitations will be addressed in future versions.
 
 ## Usage
 
-Comparing two objects:
+### Obtaining Differences
 
 ``` csharp
 using ObjDiff;
@@ -98,4 +98,13 @@ public class CompareOptions
     /// Maximum number of children levels to dive into. Default value is 10.
     public uint MaxDepth { get; set; }    
 }
+```
+
+### Patching
+
+Once we have the differences between two objects, we can apply them (patch) to the original object being compared. After patching it, both objects should be equivalent.
+
+``` csharp
+object1.Patch(object2);
+Assert.Equal(object1, object2);
 ```
