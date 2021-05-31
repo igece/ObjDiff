@@ -4,7 +4,6 @@ A C# .NET Standard library that allows to obtain the differences between two obj
 
 The patching feature is specially useful when updating Entity Framework objects as it allows to update only those values that have really changed.
 
-<!--
 ## Installation
 
 Using NuGet package manager console:
@@ -18,7 +17,6 @@ Using .NET CLI:
 ```
 dotnet add package ObjDiff
 ```
--->
 
 ## Features
 
