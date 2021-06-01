@@ -27,17 +27,11 @@ namespace ObjDiff
 
         while (i < singleProperties.Length - 1)
         {
-          var currentProperty = singleProperties[i++];
-          var match = Regex.Match(currentProperty, @"([a-zA-z_0-9]+)\[([0-9]+)\]");
-
-          if (match.Success)
+          if (IsCollectionItem(singleProperties[i++], out string currentProperty, out int? index))
           {
-            currentProperty = match.Groups[1].Value;
-            var index = int.Parse(match.Groups[2].Value);
-
             var collection = objAux.GetType().GetProperty(currentProperty)?.GetValue(objAux);
-
             var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
+
             objAux = collection.GetType().GetProperty(indexerName).GetValue(collection, new object[] { index });
           }
           else
@@ -47,8 +41,20 @@ namespace ObjDiff
             throw new TargetException("Invalid path");
         }
 
-        var property = objAux.GetType().GetProperty(singleProperties[i]);
+        // Special case: If last property in the path contains an index it means that property is a collection of
+        // simple types AND the difference is a value modification (no addition or removal) so directly apply
+        // the new value and continue to the next difference.
+        if (IsCollectionItem(singleProperties.Last(), out string lastProperty, out int? index2))
+        {
+          var collection = objAux.GetType().GetProperty(lastProperty)?.GetValue(objAux);
+          var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
 
+          collection.GetType().GetProperty(indexerName).SetValue(collection, difference.RightValue, new object[] { index2 });
+          continue;
+        }
+       
+        var property = objAux.GetType().GetProperty(lastProperty);
+       
         if (property == null)
           throw new TargetException("Invalid path");
 
@@ -57,6 +63,7 @@ namespace ObjDiff
           var collection = property.GetValue(objAux);
 
           // For those collections implementing IList, missing/extra items can be directly added/deleted.
+
           if (collection is IList list)
           {
             if (Equals(difference.LeftValue, ItemStatus.NotExist))
@@ -266,6 +273,25 @@ namespace ObjDiff
       }
 
       return differences;
+    }
+
+
+    private static bool IsCollectionItem(string indexedProperty, out string propertyName, out int? index)
+    {
+      var match = Regex.Match(indexedProperty, @"([a-zA-z_0-9]+)\[([0-9]+)\]");
+
+      if (match.Success)
+      {
+        propertyName = match.Groups[1].Value;
+        index = int.Parse(match.Groups[2].Value);
+
+        return true;
+      }
+
+      propertyName = indexedProperty;
+      index = null;
+
+      return false;
     }
 
 
