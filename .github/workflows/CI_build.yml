@@ -1,4 +1,4 @@
-name: CI Build
+name: build
 
 on:
   push:
@@ -21,5 +21,4 @@ jobs:
       run: dotnet restore src\ObjDiff.sln
     - name: Build
       run: dotnet build --no-restore src\ObjDiff\ObjDiff.csproj
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal src\Tests\Tests.csproj
+      
