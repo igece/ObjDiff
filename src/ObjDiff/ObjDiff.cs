@@ -30,9 +30,15 @@ namespace ObjDiff
           if (IsCollectionItem(singleProperties[i++], out string currentProperty, out int? index))
           {
             var collection = objAux.GetType().GetProperty(currentProperty)?.GetValue(objAux);
-            var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
+            var indexerName = string.Empty;
 
-            objAux = collection.GetType().GetProperty(indexerName).GetValue(collection, new object[] { index });
+            if (collection is Array array)
+              objAux = array.GetValue(index.Value);
+            else
+            {
+              indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
+              objAux = collection.GetType().GetProperty(indexerName).GetValue(collection, new object[] { index.Value });
+            }
           }
           else
             objAux = objAux.GetType().GetProperty(currentProperty)?.GetValue(objAux);
@@ -47,9 +53,15 @@ namespace ObjDiff
         if (IsCollectionItem(singleProperties.Last(), out string lastProperty, out int? index2))
         {
           var collection = objAux.GetType().GetProperty(lastProperty)?.GetValue(objAux);
-          var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
 
-          collection.GetType().GetProperty(indexerName).SetValue(collection, difference.RightValue, new object[] { index2 });
+          if (collection is Array array)
+            array.SetValue(difference.RightValue, index2.Value);
+          else
+          {
+            var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
+            collection.GetType().GetProperty(indexerName).SetValue(collection, difference.RightValue, new object[] { index2.Value });
+          }
+
           continue;
         }
        
@@ -105,7 +117,7 @@ namespace ObjDiff
         compareOptions = new CompareOptions();
 
       var applicableProperties = left.GetType().GetProperties().Where(p => !compareOptions.IgnoredProperties.Contains(p.Name) &&
-          !p.GetCustomAttributes(false).Any(x => compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
+        !p.GetCustomAttributes(false).Any(x => compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
 
       foreach (var property in applicableProperties)
       {
@@ -123,7 +135,10 @@ namespace ObjDiff
 
         if (IsCollection(property))
         {
-          var collectionType = property.PropertyType.IsArray ? property.PropertyType : property.PropertyType.GetGenericArguments()[0];
+          var collectionType = property.PropertyType.IsArray ? property.PropertyType.GetElementType() : property.PropertyType.GetGenericArguments()[0];
+          
+          if (!HasEqualityDefined(collectionType))
+            continue;
 
           var collection1 = (value1 as IEnumerable)?.OfType<object>() ?? new List<object>();
           var collection2 = (value2 as IEnumerable)?.OfType<object>() ?? new List<object>();
@@ -133,7 +148,7 @@ namespace ObjDiff
         
           if (collection1Count == collection2Count)
           {
-            if (IsSimpleType(collectionType) || collectionType.IsArray || (currentDepth == compareOptions.MaxDepth))
+            if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
             {
               if (compareOptions.CollectionsSameOrder)
               {
@@ -187,7 +202,7 @@ namespace ObjDiff
             var minItems = Math.Min(collection1Count, collection2Count);
             var maxItems = Math.Max(collection1Count, collection2Count);
 
-            if (IsSimpleType(collectionType) || collectionType.IsArray || (currentDepth == compareOptions.MaxDepth))
+            if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
             {
               if (compareOptions.CollectionsSameOrder)
               {
@@ -261,6 +276,9 @@ namespace ObjDiff
 
         else
         {
+          if (!HasEqualityDefined(property.PropertyType))
+            continue;
+
           if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth) || value1 == null || value2 == null)
           {
             if (!Equals(value1, value2))
@@ -295,21 +313,30 @@ namespace ObjDiff
     }
 
 
+    private static bool HasEqualityDefined(Type type)
+    {
+      if (type.GetInterface(typeof(IEquatable<>).Name) != null)
+        return true;
+
+      return type.GetMethod("Equals", new Type[] { typeof(object) }).DeclaringType != typeof(object);
+    }
+
+
     private static readonly ConcurrentDictionary<Type, bool> IsSimpleTypeCache = new ConcurrentDictionary<Type, bool>();
 
 
     private static bool IsSimpleType(Type type)
     {
       return IsSimpleTypeCache.GetOrAdd(type, t =>
-      type.IsPrimitive ||
-      type.IsEnum ||
-      type == typeof(string) ||
-      type == typeof(decimal) ||
-      type == typeof(DateTime) ||
-      type == typeof(DateTimeOffset) ||
-      type == typeof(TimeSpan) ||
-      type == typeof(Guid) ||
-      IsNullableSimpleType(type));
+        type.IsPrimitive ||
+        type.IsEnum ||
+        type == typeof(string) ||
+        type == typeof(decimal) ||
+        type == typeof(DateTime) ||
+        type == typeof(DateTimeOffset) ||
+        type == typeof(TimeSpan) ||
+        type == typeof(Guid) ||
+        IsNullableSimpleType(type));
 
       bool IsNullableSimpleType(Type t)
       {
