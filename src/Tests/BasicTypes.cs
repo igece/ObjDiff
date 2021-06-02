@@ -77,6 +77,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "Int32 - Patching difference")]
+    public void Int32PatchingDifference()
+    {
+      var left = new BasicTypesClass { Int32Property = int.MinValue };
+      var right = new BasicTypesClass { Int32Property = int.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "Int64 - No differences")]
     public void Int64NoDifferences()
     {
@@ -101,6 +114,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "Int64 - Patching difference")]
+    public void Int64PatchingDifference()
+    {
+      var left = new BasicTypesClass { Int64Property = long.MinValue };
+      var right = new BasicTypesClass { Int64Property = long.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "Float - No differences")]
     public void FloatNoDifferences()
     {
@@ -108,6 +134,7 @@ namespace Tests
       var right = new BasicTypesClass { SingleProperty = float.MinValue };
 
       var differences = left.Diff(right);
+      left.Patch(differences);
 
       Assert.Empty(differences);
     }
@@ -122,6 +149,19 @@ namespace Tests
       var differences = left.Diff(right);
 
       Assert.Single(differences);
+    }
+
+
+    [Fact(DisplayName = "Float - Patching difference")]
+    public void FloatPatchingDifference()
+    {
+      var left = new BasicTypesClass { SingleProperty = float.MinValue };
+      var right = new BasicTypesClass { SingleProperty = float.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
     }
 
 
@@ -149,6 +189,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "Double - Patching difference")]
+    public void DoublePatchingDifference()
+    {
+      var left = new BasicTypesClass { DoubleProperty = double.MinValue };
+      var right = new BasicTypesClass { DoubleProperty = double.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "Decimal - No differences")]
     public void DecimalNoDifferences()
     {
@@ -170,6 +223,19 @@ namespace Tests
       var differences = left.Diff(right);
 
       Assert.Single(differences);
+    }
+
+
+    [Fact(DisplayName = "Decimal - Patching difference")]
+    public void DecimalPatchingDifference()
+    {
+      var left = new BasicTypesClass { DecimalProperty = decimal.MinValue };
+      var right = new BasicTypesClass { DecimalProperty = decimal.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
     }
 
 
@@ -197,6 +263,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "String - Patching difference")]
+    public void StringPatchingDifference()
+    {
+      var left = new BasicTypesClass { StringProperty = "Left Value" };
+      var right = new BasicTypesClass { StringProperty = "Right Value" };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "DateTime - No differences")]
     public void DateTimeNoDifferences()
     {
@@ -218,6 +297,19 @@ namespace Tests
       var differences = left.Diff(right);
 
       Assert.Single(differences);
+    }
+
+
+    [Fact(DisplayName = "DateTime - Patching difference")]
+    public void DateTimePatchingDifference()
+    {
+      var left = new BasicTypesClass { DateTimeProperty = DateTime.MinValue };
+      var right = new BasicTypesClass { DateTimeProperty = DateTime.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
     }
 
 
@@ -245,6 +337,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "DateTimeOffset - Patching difference")]
+    public void DateTimeOffsetPatchingDifference()
+    {
+      var left = new BasicTypesClass { DateTimeOffsetProperty = DateTimeOffset.MinValue };
+      var right = new BasicTypesClass { DateTimeOffsetProperty = DateTimeOffset.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "TimeSpan - No differences")]
     public void TimeSpanNoDifferences()
     {
@@ -266,6 +371,19 @@ namespace Tests
       var differences = left.Diff(right);
 
       Assert.Single(differences);
+    }
+
+
+    [Fact(DisplayName = "TimeSpan - Patching difference")]
+    public void TimeSpanPatchingDifference()
+    {
+      var left = new BasicTypesClass { TimeSpanProperty = TimeSpan.MinValue };
+      var right = new BasicTypesClass { TimeSpanProperty = TimeSpan.MaxValue };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
     }
 
 
@@ -293,6 +411,19 @@ namespace Tests
     }
 
 
+    [Fact(DisplayName = "Guid - Patching difference")]
+    public void GuidPatchingDifference()
+    {
+      var left = new BasicTypesClass { GuidProperty = Guid.NewGuid() };
+      var right = new BasicTypesClass { GuidProperty = Guid.NewGuid() };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
+    }
+
+
     [Fact(DisplayName = "Multiple differences")]
     public void MultipleDifferences()
     {
@@ -302,6 +433,19 @@ namespace Tests
       var differences = left.Diff(right);
 
       Assert.True(differences.Count() == 2);
+    }
+
+
+    [Fact(DisplayName = "Patching multiple differences")]
+    public void PatchingMultipleDifferences()
+    {
+      var left = new BasicTypesClass { Int32Property = int.MinValue };
+      var right = new BasicTypesClass { StringProperty = "Right Value" };
+
+      var differences = left.Diff(right);
+      left.Patch(differences);
+
+      Assert.Equal(left, right);
     }
   }
 }
