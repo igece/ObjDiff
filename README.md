@@ -105,6 +105,6 @@ public class CompareOptions
 Once we have the differences between two objects, we can apply them (patch) to the original object being compared. After patching it, both objects should be equivalent.
 
 ``` csharp
-object1.Patch(object2);
+object1.Patch(differences);
 Assert.Equal(object1, object2);
 ```
