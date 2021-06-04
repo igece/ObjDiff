@@ -118,13 +118,13 @@ namespace ObjDiff
 
       var applicableProperties = left.GetType().GetProperties().Where(p => !compareOptions.IgnoredProperties.Contains(p.Name) &&
         !p.GetCustomAttributes(false).Any(x => compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
-
+      
       foreach (var property in applicableProperties)
       {
-        var value1 = property.GetValue(left);
-        var value2 = property.GetValue(right);
+        var leftValue = property.GetValue(left);
+        var rightValue = property.GetValue(right);
 
-        if ((value1 == null) && (value2 == null))
+        if ((leftValue == null) && (rightValue == null))
           continue;
 
         if (string.IsNullOrEmpty(path) && (arrayIndex != null))
@@ -140,130 +140,35 @@ namespace ObjDiff
           if (!HasEqualityDefined(collectionType))
             continue;
 
-          var collection1 = (value1 as IEnumerable)?.OfType<object>() ?? new List<object>();
-          var collection2 = (value2 as IEnumerable)?.OfType<object>() ?? new List<object>();
+          var leftCollection = (leftValue as IEnumerable)?.OfType<object>() ?? new List<object>();
+          var rightCollection = (rightValue as IEnumerable)?.OfType<object>() ?? new List<object>();
+          var minItems = Math.Min(leftCollection.Count(), rightCollection.Count());
 
-          var collection1Count = collection1.Count();
-          var collection2Count = collection2.Count();
-        
-          if (collection1Count == collection2Count)
+          if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
           {
-            if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
+            if (compareOptions.CollectionsSameOrder)
             {
-              if (compareOptions.CollectionsSameOrder)
+              for (int i = 0; i < minItems; i++)
               {
-                for (int i = 0; i < collection1Count; i++)
-                {
-                  var collection1Value = collection1.ElementAt(i);
-                  var collection2Value = collection2.ElementAt(i);
+                var leftCollectionValue = leftCollection.ElementAt(i);
+                var rightCollectionValue = rightCollection.ElementAt(i);
 
-                  if (!Equals(collection1Value, collection2Value))
-                    differences.Add(new Difference($"{propertyPath}[{i}]", collection1Value, collection2Value));
-                }
-              }
-
-              else
-              {
-                var collection1Exclusive = collection1.Except(collection2).ToList();
-                var collection2Exclusive = collection2.Except(collection1).ToList();
-
-                foreach (var item in collection1Exclusive)
-                  differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
-
-                foreach (var item in collection2Exclusive)
-                  differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
-              }
-            }
-
-            else
-            {
-              if (compareOptions.CollectionsSameOrder)
-              {
-                for (int i = 0; i < collection1Count; i++)
-                  differences.AddRange(Diff(collection1.ElementAt(i), collection2.ElementAt(i), compareOptions, propertyPath, i, currentDepth + 1));
-              }
-
-              else
-              {
-                var collection1Exclusive = collection1.Except(collection2).ToList();
-                var collection2Exclusive = collection2.Except(collection1).ToList();
-
-                foreach (var item in collection1Exclusive)
-                  differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
-
-                foreach (var item in collection2Exclusive)
-                  differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
+                if (!Equals(leftCollectionValue, rightCollectionValue))
+                  differences.Add(new Difference($"{propertyPath}[{i}]", leftCollectionValue, rightCollectionValue));
               }
             }
           }
 
           else
           {
-            var minItems = Math.Min(collection1Count, collection2Count);
-            var maxItems = Math.Max(collection1Count, collection2Count);
-
-            if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
-            {
-              if (compareOptions.CollectionsSameOrder)
-              {
-                for (int i = 0; i < minItems; i++)
-                {
-                  var collection1Value = collection1.ElementAt(i);
-                  var collection2Value = collection2.ElementAt(i);
-
-                  if (!Equals(collection1Value, collection2Value))
-                    differences.Add(new Difference($"{propertyPath}[{i}]", collection1Value, collection2Value));
-                }
-
-                if (minItems == collection1Count)
-                {
-                  for (int i = minItems; i < collection2Count; i++)
-                  {
-                    var collection2Value = collection2.ElementAt(i);
-                    differences.Add(new Difference(propertyPath, ItemStatus.NotExist, collection2Value));
-                  }
-                }
-
-                else
-                {
-                  for (int i = minItems; i < collection1Count; i++)
-                  {
-                    var collection1Value = collection1.ElementAt(i);
-                    differences.Add(new Difference(propertyPath, collection1Value, ItemStatus.NotExist));
-                  }
-                }
-              }
-
-              else
-              {
-                throw new NotImplementedException();
-              }
-            }
-
-            else
+            if (compareOptions.CollectionsSameOrder)
             {
               for (int i = 0; i < minItems; i++)
-                differences.AddRange(Diff(collection1.ElementAt(i), collection2.ElementAt(i), compareOptions, propertyPath, i, currentDepth + 1));
-
-              if (minItems == collection1Count)
-              {
-                for (int i = minItems; i < collection2Count; i++)
-                {
-                  var collection2Value = collection2.ElementAt(i);
-                  differences.Add(new Difference(propertyPath, ItemStatus.NotExist, collection2Value));
-                }
-              }
-
-              else
-              {
-                for (int i = minItems; i < collection1Count; i++)
-                {
-                  var collection1Value = collection1.ElementAt(i);
-                  differences.Add(new Difference(propertyPath, collection1Value, ItemStatus.NotExist));
-                }
-              }
-            }
+                differences.AddRange(Diff(leftCollection.ElementAt(i), rightCollection.ElementAt(i), compareOptions, propertyPath, i, currentDepth + 1));
+            }            
           }
+
+          AddNonCommonItemsToDifferences(differences, propertyPath, leftCollection, rightCollection, compareOptions.CollectionsSameOrder);
         }
 
 
@@ -279,14 +184,14 @@ namespace ObjDiff
           if (!HasEqualityDefined(property.PropertyType))
             continue;
 
-          if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth) || value1 == null || value2 == null)
+          if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth) || leftValue == null || rightValue == null)
           {
-            if (!Equals(value1, value2))
-              differences.Add(new Difference(propertyPath, value1, value2));
+            if (!Equals(leftValue, rightValue))
+              differences.Add(new Difference(propertyPath, leftValue, rightValue));
           }
 
           else
-            differences.AddRange(Diff(value1, value2, compareOptions, propertyPath, arrayIndex, currentDepth + 1));
+            differences.AddRange(Diff(leftValue, rightValue, compareOptions, propertyPath, arrayIndex, currentDepth + 1));
         }
       }
 
@@ -356,6 +261,50 @@ namespace ObjDiff
     private static bool IsDictionary(PropertyInfo propertyInfo)
     {
       return propertyInfo.PropertyType.GetInterface(nameof(IDictionary)) != null;
+    }
+
+
+    private static void AddNonCommonItemsToDifferences(IList<Difference> differences, string propertyPath, IEnumerable<object> leftCollection, IEnumerable<object> rightCollection, bool sameOrder)
+    {
+      if (sameOrder)
+      {
+        var leftCollectionCount = leftCollection.Count();
+        var rightCollectionCount = rightCollection.Count();
+        var minItems = Math.Min(leftCollectionCount, rightCollectionCount);
+
+        if (leftCollectionCount != rightCollectionCount)
+        {
+          if (minItems == leftCollectionCount)
+          {
+            for (int i = minItems; i < rightCollectionCount; i++)
+            {
+              var rightCollectionValue = rightCollection.ElementAt(i);
+              differences.Add(new Difference(propertyPath, ItemStatus.NotExist, rightCollectionValue));
+            }
+          }
+
+          else
+          {
+            for (int i = minItems; i < leftCollectionCount; i++)
+            {
+              var leftCollectionValue = leftCollection.ElementAt(i);
+              differences.Add(new Difference(propertyPath, leftCollectionValue, ItemStatus.NotExist));
+            }
+          }
+        }
+      }
+
+      else
+      {
+        var leftCollectionExclusive = leftCollection.Except(rightCollection).ToList();
+        var rightCollectionExclusive = rightCollection.Except(leftCollection).ToList();
+
+        foreach (var item in leftCollectionExclusive)
+          differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
+
+        foreach (var item in rightCollectionExclusive)
+          differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
+      }
     }
   }
 }
