@@ -55,7 +55,28 @@ namespace ObjDiff
           var collection = objAux.GetType().GetProperty(lastProperty)?.GetValue(objAux);
 
           if (collection is Array array)
+          {
             array.SetValue(difference.RightValue, index2.Value);
+          }
+
+          else if (collection is IDictionary dict)
+          {
+            var leftKey = difference.LeftValue.GetType().GetProperty("Key").GetValue(difference.LeftValue);
+            var leftValue = difference.LeftValue.GetType().GetProperty("Value").GetValue(difference.LeftValue);
+
+            var rightKey = difference.RightValue.GetType().GetProperty("Key").GetValue(difference.RightValue);
+            var rightValue = difference.RightValue.GetType().GetProperty("Value").GetValue(difference.RightValue);
+
+            if (!Equals(leftKey, rightKey))
+            {
+              dict.Remove(leftKey);
+              dict[rightKey] = rightValue;
+            }
+
+            else
+              dict[leftKey] = rightValue;
+          }
+
           else
           {
             var indexerName = ((DefaultMemberAttribute)collection.GetType().GetCustomAttributes(typeof(DefaultMemberAttribute), true)[0]).MemberName;
@@ -142,6 +163,8 @@ namespace ObjDiff
 
           var leftCollection = (leftValue as IEnumerable)?.OfType<object>() ?? new List<object>();
           var rightCollection = (rightValue as IEnumerable)?.OfType<object>() ?? new List<object>();
+          var leftCollectionCount = leftCollection.Count();
+          var rightCollectionCount = rightCollection.Count();
           var minItems = Math.Min(leftCollection.Count(), rightCollection.Count());
 
           if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
@@ -168,16 +191,44 @@ namespace ObjDiff
             }            
           }
 
-          AddNonCommonItemsToDifferences(differences, propertyPath, leftCollection, rightCollection, compareOptions.CollectionsSameOrder);
+          // Add non-common items to differences.
+
+          if (compareOptions.CollectionsSameOrder)
+          {
+            if (leftCollectionCount != rightCollectionCount)
+            {
+              if (minItems == leftCollectionCount)
+              {
+                for (int i = minItems; i < rightCollectionCount; i++)
+                {
+                  var rightCollectionValue = rightCollection.ElementAt(i);
+                  differences.Add(new Difference(propertyPath, ItemStatus.NotExist, rightCollectionValue));
+                }
+              }
+
+              else
+              {
+                for (int i = minItems; i < leftCollectionCount; i++)
+                {
+                  var leftCollectionValue = leftCollection.ElementAt(i);
+                  differences.Add(new Difference(propertyPath, leftCollectionValue, ItemStatus.NotExist));
+                }
+              }
+            }
+          }
+
+          else
+          {
+            var leftCollectionExclusive = leftCollection.Except(rightCollection).ToList();
+            var rightCollectionExclusive = rightCollection.Except(leftCollection).ToList();
+
+            foreach (var item in leftCollectionExclusive)
+              differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
+
+            foreach (var item in rightCollectionExclusive)
+              differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
+          }
         }
-
-
-        else if (IsDictionary(property))
-        {
-          // TODO: Dictionaries not yet supported.
-          continue;
-        }
-
 
         else
         {
@@ -255,56 +306,6 @@ namespace ObjDiff
     {
       return propertyInfo.PropertyType != typeof(string) &&
              propertyInfo.PropertyType.GetInterface(nameof(IEnumerable)) != null;
-    }
-
-
-    private static bool IsDictionary(PropertyInfo propertyInfo)
-    {
-      return propertyInfo.PropertyType.GetInterface(nameof(IDictionary)) != null;
-    }
-
-
-    private static void AddNonCommonItemsToDifferences(IList<Difference> differences, string propertyPath, IEnumerable<object> leftCollection, IEnumerable<object> rightCollection, bool sameOrder)
-    {
-      if (sameOrder)
-      {
-        var leftCollectionCount = leftCollection.Count();
-        var rightCollectionCount = rightCollection.Count();
-        var minItems = Math.Min(leftCollectionCount, rightCollectionCount);
-
-        if (leftCollectionCount != rightCollectionCount)
-        {
-          if (minItems == leftCollectionCount)
-          {
-            for (int i = minItems; i < rightCollectionCount; i++)
-            {
-              var rightCollectionValue = rightCollection.ElementAt(i);
-              differences.Add(new Difference(propertyPath, ItemStatus.NotExist, rightCollectionValue));
-            }
-          }
-
-          else
-          {
-            for (int i = minItems; i < leftCollectionCount; i++)
-            {
-              var leftCollectionValue = leftCollection.ElementAt(i);
-              differences.Add(new Difference(propertyPath, leftCollectionValue, ItemStatus.NotExist));
-            }
-          }
-        }
-      }
-
-      else
-      {
-        var leftCollectionExclusive = leftCollection.Except(rightCollection).ToList();
-        var rightCollectionExclusive = rightCollection.Except(leftCollection).ToList();
-
-        foreach (var item in leftCollectionExclusive)
-          differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
-
-        foreach (var item in rightCollectionExclusive)
-          differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
-      }
     }
   }
 }

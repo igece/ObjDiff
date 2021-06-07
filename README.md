@@ -4,7 +4,8 @@
 
 A C# .NET Standard library that allows to obtain the differences between two objects using reflection.
 
-Optionally, these differences can be used to patch the first object so it becomes equal to the second one. This patching feature is specially useful when updating Entity Framework objects as it allows to update only those values that have really changed.
+Optionally, these differences can be used to patch the first object so it becomes equal to the second one.
+This patching feature is specially useful when updating Entity Framework objects as it allows to update only those values that have really changed.
 
 ## Installation
 
@@ -33,8 +34,6 @@ This library is still in an early stage of development and so it lacks some feat
 
 * Only allows to compare objects of the same type
 * Only public properties are compared
-* Dictionaries comparison not yet supported (just now, they are ignored)
-<!-- * Arrays and collections comparison assumes that all items shall be in the same order -->
 
 The above limitations will be addressed in future versions.
 
