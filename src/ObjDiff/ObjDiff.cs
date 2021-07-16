@@ -127,6 +127,12 @@ namespace ObjDiff
     }
 
 
+    public static void MakeEqual<T>(T source, T target, CompareOptions compareOptions = null) where T : class
+    {
+      Patch(target, Diff(target, source, compareOptions));
+    }
+
+
     private static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
     {
       var differences = new List<Difference>();

@@ -15,5 +15,11 @@ namespace ObjDiff
     {
       ObjDiff.Patch(target, differences);
     }
+
+
+    public static void MakeEqualTo<T>(this T target, T source, CompareOptions compareOptions = null) where T : class
+    {
+      ObjDiff.MakeEqual(source, target, compareOptions);
+    }
   }
 }
