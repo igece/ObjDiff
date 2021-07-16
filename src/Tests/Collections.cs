@@ -26,7 +26,10 @@ namespace Tests
     }
 
     public bool Equals(CollectionsClass other)
-    {    
+    {
+      if (other == null)
+        return false;
+
       return Enumerable.SequenceEqual(Int32List, other.Int32List) &&
         Enumerable.SequenceEqual(Int32Collection, other.Int32Collection) &&
         Enumerable.SequenceEqual(ComplexTypeList, other.ComplexTypeList);
@@ -71,8 +74,7 @@ namespace Tests
       var left = new CollectionsClass { Int32List = new List<int>() { 7, 56, 3 } };
       var right = new CollectionsClass { Int32List = new List<int>() { 7, 14, 3 } };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }

@@ -83,8 +83,7 @@ namespace Tests
       var left = new BasicTypesClass { Int32Property = int.MinValue };
       var right = new BasicTypesClass { Int32Property = int.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -120,8 +119,7 @@ namespace Tests
       var left = new BasicTypesClass { Int64Property = long.MinValue };
       var right = new BasicTypesClass { Int64Property = long.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -134,7 +132,6 @@ namespace Tests
       var right = new BasicTypesClass { SingleProperty = float.MinValue };
 
       var differences = left.Diff(right);
-      left.Patch(differences);
 
       Assert.Empty(differences);
     }
@@ -158,8 +155,7 @@ namespace Tests
       var left = new BasicTypesClass { SingleProperty = float.MinValue };
       var right = new BasicTypesClass { SingleProperty = float.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -195,8 +191,7 @@ namespace Tests
       var left = new BasicTypesClass { DoubleProperty = double.MinValue };
       var right = new BasicTypesClass { DoubleProperty = double.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -232,8 +227,7 @@ namespace Tests
       var left = new BasicTypesClass { DecimalProperty = decimal.MinValue };
       var right = new BasicTypesClass { DecimalProperty = decimal.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -269,8 +263,7 @@ namespace Tests
       var left = new BasicTypesClass { StringProperty = "Left Value" };
       var right = new BasicTypesClass { StringProperty = "Right Value" };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -306,8 +299,7 @@ namespace Tests
       var left = new BasicTypesClass { DateTimeProperty = DateTime.MinValue };
       var right = new BasicTypesClass { DateTimeProperty = DateTime.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -343,8 +335,7 @@ namespace Tests
       var left = new BasicTypesClass { DateTimeOffsetProperty = DateTimeOffset.MinValue };
       var right = new BasicTypesClass { DateTimeOffsetProperty = DateTimeOffset.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -380,8 +371,7 @@ namespace Tests
       var left = new BasicTypesClass { TimeSpanProperty = TimeSpan.MinValue };
       var right = new BasicTypesClass { TimeSpanProperty = TimeSpan.MaxValue };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -417,8 +407,7 @@ namespace Tests
       var left = new BasicTypesClass { GuidProperty = Guid.NewGuid() };
       var right = new BasicTypesClass { GuidProperty = Guid.NewGuid() };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
@@ -442,8 +431,7 @@ namespace Tests
       var left = new BasicTypesClass { Int32Property = int.MinValue };
       var right = new BasicTypesClass { StringProperty = "Right Value" };
 
-      var differences = left.Diff(right);
-      left.Patch(differences);
+      left.MakeEqualTo(right);
 
       Assert.Equal(left, right);
     }
