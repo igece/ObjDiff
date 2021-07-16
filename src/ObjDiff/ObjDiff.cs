@@ -127,7 +127,7 @@ namespace ObjDiff
     }
 
 
-    public static void MakeEqual<T>(T source, T target, CompareOptions compareOptions = null) where T : class
+    public static void MakeEqual<T>(T target, T source, CompareOptions compareOptions = null) where T : class
     {
       Patch(target, Diff(target, source, compareOptions));
     }
