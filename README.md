@@ -1,4 +1,5 @@
 # ObjDiff
+
 [![Build](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml)
 [![Tests](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml)
 
@@ -106,4 +107,16 @@ Once we have the differences between two objects, we can apply them (patch) to t
 ``` csharp
 object1.Patch(differences);
 Assert.Equal(object1, object2);
+```
+
+Both `Diff` and `Patch` operations can be executed through a simple call:
+
+``` csharp
+ObjDiff.MakeEqual(object1, object2);
+```
+
+Or using `MakeEqualTo` extension method:
+
+``` csharp
+object1.MakeEqualTo(object2);
 ```
