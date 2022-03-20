@@ -38,7 +38,7 @@ This library is still in an early stage of development and so it lacks some feat
 * Only allows to compare objects of the same type
 * Only public properties are compared
 
-The above limitations will be addressed in future versions.
+The above limitations may be addressed in future versions.
 
 ## Usage
 
