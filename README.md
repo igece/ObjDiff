@@ -6,7 +6,7 @@
 A C# .NET Standard library that allows to obtain the differences between two objects using reflection.
 
 Optionally, these differences can be used to patch the first object so it becomes equal to the second one.
-This patching feature is specially useful when updating Entity Framework objects as it allows to update only those values that have really changed.
+This patching feature is specially useful when updating Entity Framework entities as it allows to update only those properties that have really changed.
 
 ## Installation
 
