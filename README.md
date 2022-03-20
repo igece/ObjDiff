@@ -1,5 +1,7 @@
 # ObjDiff
 
+[![nuget](https://img.shields.io/nuget/v/ObjDiff.svg)](https://www.nuget.org/packages/ObjDiff)
+[![nuget](https://img.shields.io/nuget/dt/ObjDiff.svg)](https://www.nuget.org/packages/ObjDiff)
 [![Build](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml)
 [![Tests](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml)
 
