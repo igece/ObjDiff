@@ -105,7 +105,13 @@ public class CompareOptions
 Any property marked with the `IgnoreDifferences` attribute will always be skipped during the comparison process, no matter
 the actual value of the `IgnoredAttributes` property if `CompareOptions` is used.
 
-The usage of this attribute
+``` csharp
+public class SampleClass
+{
+    [IgnoreDifferences]
+    public string SampleProperty { get; set; }
+}
+```
 
 ### Patching
 
