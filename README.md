@@ -33,8 +33,6 @@ dotnet add package ObjDiff
 
 ## Current Limitations
 
-This library is still in an early stage of development and so it lacks some features that similar libraries can offer:
-
 * Only allows to compare objects of the same type
 * Only public properties are compared
 
@@ -101,6 +99,13 @@ public class CompareOptions
     public uint MaxDepth { get; set; }    
 }
 ```
+
+### Ignoring Properties
+
+Any property marked with the `IgnoreDifferences` attribute will always be skipped during the comparison process, no matter
+the actual value of the `IgnoredAttributes` property if `CompareOptions` is used.
+
+The usage of this attribute
 
 ### Patching
 

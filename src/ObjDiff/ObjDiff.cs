@@ -144,7 +144,7 @@ namespace ObjDiff
         compareOptions = new CompareOptions();
 
       var applicableProperties = left.GetType().GetProperties().Where(p => !compareOptions.IgnoredProperties.Contains(p.Name) &&
-        !p.GetCustomAttributes(false).Any(x => compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
+        !p.GetCustomAttributes(false).Any(x => x.GetType() == typeof(IgnoreDifferencesAttribute) || compareOptions.IgnoredAttributes.Contains(x.GetType().Name)));
       
       foreach (var property in applicableProperties)
       {

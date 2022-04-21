@@ -12,8 +12,8 @@
     <Authors>Israel Gómez de Celis González</Authors>
     <Description>A C# .NET Standard library that allows to obtain the differences between two objects and, optionally, patch the first object with these differences so it becomes equal to the second one.</Description>
     <Copyright>Copyright (c) 2021 Israel Gómez de Celis González</Copyright>
-    <Version>1.2.0</Version>
-    <PackageReleaseNotes>Added method MakeEqual as a shortcut to call Diff followed by Patch.</PackageReleaseNotes>
+    <Version>1.3.0</Version>
+    <PackageReleaseNotes>New IgnoreDifferences attribute. Any property marked with this attribute will be always ignored.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
