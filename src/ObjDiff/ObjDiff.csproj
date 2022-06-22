@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;net462</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
@@ -12,8 +12,8 @@
     <Authors>Israel Gómez de Celis González</Authors>
     <Description>A C# .NET Standard library that allows to obtain the differences between two objects and, optionally, patch the first object with these differences so it becomes equal to the second one.</Description>
     <Copyright>Copyright (c) 2021 Israel Gómez de Celis González</Copyright>
-    <Version>1.3.0</Version>
-    <PackageReleaseNotes>New IgnoreDifferences attribute. Any property marked with this attribute will be always ignored.</PackageReleaseNotes>
+    <Version>1.3.1</Version>
+    <PackageReleaseNotes>Added support for .NET 6 DateOnly and TimeOnly structures.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
