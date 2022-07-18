@@ -162,7 +162,23 @@ namespace ObjDiff
 
                 if (IsCollection(property))
                 {
-                    var collectionType = property.PropertyType.IsArray ? property.PropertyType.GetElementType() : property.PropertyType.GetGenericArguments()[0];
+                    Type collectionType = null;
+
+                    if (property.PropertyType.IsArray)
+                        collectionType = property.PropertyType.GetElementType();
+
+                    else
+                    {
+                        var genericArguments = property.PropertyType.GetGenericArguments();
+
+                        while (genericArguments != null && genericArguments.Length == 0)
+                            genericArguments = property.PropertyType.BaseType?.GetGenericArguments();
+
+                        if (genericArguments == null)
+                            throw new Exception("Unable to obtain generic arguments of a collection property");
+
+                        collectionType = genericArguments[0];
+                    }
 
                     if (!HasEqualityDefined(collectionType))
                         continue;
@@ -277,7 +293,9 @@ namespace ObjDiff
 
         private static bool HasEqualityDefined(Type type)
         {
-            if (type.GetInterface(typeof(IEquatable<>).Name) != null)
+            var filter = new TypeFilter((c, o) => c.ToString() == o.ToString());
+
+            if (type.FindInterfaces(filter, typeof(IEquatable<>)).Length > 0)
                 return true;
 
             return type.GetMethod("Equals", new Type[] { typeof(object) }).DeclaringType != typeof(object);
@@ -309,6 +327,12 @@ namespace ObjDiff
                 var underlyingType = Nullable.GetUnderlyingType(t);
                 return underlyingType != null && IsSimpleType(underlyingType);
             }
+        }
+
+
+        private static bool IsDictionary(PropertyInfo propertyInfo)
+        {
+            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>);
         }
 
 
