@@ -12,31 +12,31 @@ This patching feature is specially useful when updating Entity Framework entitie
 
 ## Installation
 
-Using NuGet package manager console:
-
-```
-Install-Package ObjDiff
-```
-
 Using .NET CLI:
 
 ```
 dotnet add package ObjDiff
 ```
 
+Using NuGet package manager console:
+
+```
+Install-Package ObjDiff
+```
+
+
+
 ## Features
 
-* Compares arrays and collections
-* Compares children objects
-* Configuration options to ignore specific elements
-* Patch an object with an obtained set of differences
+* Compares arrays and collections.
+* Compares children objects.
+* Configuration options to ignore specific elements.
+* Patch an object with an obtained set of differences.
 
-## Current Limitations
+## Limitations
 
-* Only allows to compare objects of the same type
-* Only public properties are compared
-
-The above limitations may be addressed in future versions.
+* Only allows to compare objects of the same type.
+* Only public properties are compared.
 
 ## Usage
 
@@ -94,6 +94,9 @@ public class CompareOptions
 
     /// Ignore properties named with any of the specified values. None set by default.
     public string[] IgnoredProperties { get; set; }
+
+    /// Don't dive into any property named with any of the specified values. None set by default.
+    public string[] DontDiveProperties { get; set; }
 
     /// Maximum number of children levels to dive into. Default value is 10.
     public uint MaxDepth { get; set; }    
