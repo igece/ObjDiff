@@ -128,6 +128,12 @@ namespace ObjDiff
         }
 
 
+        public static bool AreEqual<T>(T left, T right, CompareOptions compareOptions = null) where T : class
+        {
+            return !Diff(left, right, compareOptions).Any();
+        }
+
+
         public static void MakeEqual<T>(T target, T source, CompareOptions compareOptions = null) where T : class
         {
             Patch(target, Diff(target, source, compareOptions));
