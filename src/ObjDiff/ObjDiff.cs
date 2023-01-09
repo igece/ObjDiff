@@ -12,7 +12,7 @@ using ObjDiff.Exceptions;
 
 namespace ObjDiff
 {
-    public class ObjDiff
+    public static class ObjDiff
     {
         public static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions = null) where T : class
         {
@@ -65,8 +65,6 @@ namespace ObjDiff
                     else if (collection is IDictionary dict)
                     {
                         var leftKey = difference.LeftValue.GetType().GetProperty("Key").GetValue(difference.LeftValue);
-                        var leftValue = difference.LeftValue.GetType().GetProperty("Value").GetValue(difference.LeftValue);
-
                         var rightKey = difference.RightValue.GetType().GetProperty("Key").GetValue(difference.RightValue);
                         var rightValue = difference.RightValue.GetType().GetProperty("Value").GetValue(difference.RightValue);
 
@@ -323,17 +321,15 @@ namespace ObjDiff
 #endif
                 IsNullableSimpleType(type));
 
+#if NET6_0_OR_GREATER
+            static bool IsNullableSimpleType(Type t)
+#else
             bool IsNullableSimpleType(Type t)
+#endif
             {
                 var underlyingType = Nullable.GetUnderlyingType(t);
                 return underlyingType != null && IsSimpleType(underlyingType);
             }
-        }
-
-
-        private static bool IsDictionary(PropertyInfo propertyInfo)
-        {
-            return propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(Dictionary<,>);
         }
 
 
