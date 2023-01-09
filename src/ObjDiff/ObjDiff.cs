@@ -296,9 +296,7 @@ namespace ObjDiff
 
         private static bool HasEqualityDefined(Type type)
         {
-            var filter = new TypeFilter((c, o) => c.ToString() == o.ToString());
-
-            if (type.FindInterfaces(filter, typeof(IEquatable<>)).Length > 0)
+            if (type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEquatable<>)))
                 return true;
 
             return type.GetMethod("Equals", new Type[] { typeof(object) }).DeclaringType != typeof(object);
