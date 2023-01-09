@@ -121,7 +121,7 @@ namespace ObjDiff
                     }
                 }
 
-                else
+                else if (property.CanWrite)
                     property.SetValue(objAux, difference.RightValue);
             }
         }
