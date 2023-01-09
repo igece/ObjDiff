@@ -190,7 +190,9 @@ namespace ObjDiff
                     var rightCollectionCount = rightCollection.Count();
                     var minItems = Math.Min(leftCollection.Count(), rightCollection.Count());
 
-                    if (IsSimpleType(collectionType) || (currentDepth == compareOptions.MaxDepth))
+                    if (IsSimpleType(collectionType) ||
+                        (currentDepth == compareOptions.MaxDepth) ||
+                        compareOptions.DontDiveProperties.Contains(property.Name))
                     {
                         if (compareOptions.CollectionsSameOrder)
                         {
@@ -258,7 +260,10 @@ namespace ObjDiff
                     if (!HasEqualityDefined(property.PropertyType))
                         continue;
 
-                    if (IsSimpleType(property.PropertyType) || (currentDepth == compareOptions.MaxDepth) || leftValue == null || rightValue == null)
+                    if (IsSimpleType(property.PropertyType) ||
+                        currentDepth == compareOptions.MaxDepth ||
+                        compareOptions.DontDiveProperties.Contains(property.Name) ||
+                        leftValue == null || rightValue == null)
                     {
                         if (!Equals(leftValue, rightValue))
                             differences.Add(new Difference(propertyPath, leftValue, rightValue));
