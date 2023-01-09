@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjDiff
+namespace ObjDiff.Attributes
 {
     [AttributeUsage(AttributeTargets.Property)]
     public class IgnoreDifferencesAttribute : Attribute

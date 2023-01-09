@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
+using ObjDiff.Attributes;
 using ObjDiff.Exceptions;
 
 
