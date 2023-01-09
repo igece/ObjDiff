@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
+using ObjDiff.Exceptions;
+
 
 namespace ObjDiff
 {
@@ -44,7 +46,7 @@ namespace ObjDiff
                         objAux = objAux.GetType().GetProperty(currentProperty)?.GetValue(objAux);
 
                     if (objAux == null)
-                        throw new TargetException("Invalid path");
+                        throw new ObjDiffException("Invalid path");
                 }
 
                 // Special case: If last property in the path contains an index it means that property is a collection of
@@ -89,7 +91,7 @@ namespace ObjDiff
                 var property = objAux.GetType().GetProperty(lastProperty);
 
                 if (property == null)
-                    throw new TargetException("Invalid path");
+                    throw new ObjDiffException("Invalid path");
 
                 if (IsCollection(property))
                 {
@@ -155,7 +157,7 @@ namespace ObjDiff
                     continue;
 
                 if (string.IsNullOrEmpty(path) && (arrayIndex != null))
-                    throw new Exception("Array index specified while in root path");
+                    throw new ObjDiffException("Array index specified while in root path");
 
                 var arrayIndexStr = arrayIndex != null ? $"[{arrayIndex}]" : string.Empty;
                 var propertyPath = string.IsNullOrEmpty(path) ? property.Name : $"{path}{arrayIndexStr}.{property.Name}";
@@ -175,7 +177,7 @@ namespace ObjDiff
                             genericArguments = property.PropertyType.BaseType?.GetGenericArguments();
 
                         if (genericArguments == null)
-                            throw new Exception("Unable to obtain generic arguments of a collection property");
+                            throw new ObjDiffException("Unable to obtain generic arguments of a collection property");
 
                         collectionType = genericArguments[0];
                     }
