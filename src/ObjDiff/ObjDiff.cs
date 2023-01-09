@@ -136,6 +136,9 @@ namespace ObjDiff
 
         private static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
         {
+            if (!HasEqualityDefined(left.GetType()))
+                throw new ObjDiffException("Type does not implement IEquatable<> interface nor overrides default Equals method.");
+
             var differences = new List<Difference>();
 
             if ((left == null) && (right == null))
