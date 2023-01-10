@@ -3,7 +3,7 @@
 [![nuget](https://img.shields.io/nuget/v/ObjDiff.svg)](https://www.nuget.org/packages/ObjDiff)
 [![nuget](https://img.shields.io/nuget/dt/ObjDiff.svg)](https://www.nuget.org/packages/ObjDiff)
 [![Build](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml)
-[![Tests](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml)
+[![Unit Tests](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml)
 
 A C# .NET Standard library that allows to obtain the differences between two objects using reflection.
 
@@ -128,11 +128,25 @@ Assert.Equal(object1, object2);
 Both `Diff` and `Patch` operations can be executed through a simple call:
 
 ``` csharp
-ObjDiff.MakeEqual(object1, object2);
+ObjDiff.MakeEqual(object1, object2, compareOptions);
 ```
 
 Or using `MakeEqualTo` extension method:
 
 ``` csharp
-object1.MakeEqualTo(object2);
+object1.MakeEqualTo(object2, compareOptions);
+```
+
+### Checking Equality
+
+The library also offers a method to easily check that two objects are equal (attending to ObjDiff rules):
+
+``` csharp
+ObjDiff.AreEqual(object1, object2, compareOptions);
+```
+
+Or using `IsEqualTo` extension method:
+
+``` csharp
+object1.IsEqualTo(object2, compareOptions);
 ```
