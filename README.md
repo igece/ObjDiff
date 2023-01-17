@@ -5,10 +5,14 @@
 [![Build](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_build.yml)
 [![Unit Tests](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml/badge.svg)](https://github.com/igece/ObjDiff/actions/workflows/CI_Tests.yml)
 
-A C# .NET Standard library that allows to obtain the differences between two objects using reflection.
+A C# .NET Standard library that allows to check for equality and obtain the differences between two objects using reflection.
+The comparison process can be configured in many ways so, e.g., it can ignore certain properties.
 
 Optionally, these differences can be used to patch the first object so it becomes equal to the second one.
-This patching feature is specially useful when updating Entity Framework entities as it allows to update only those properties that have really changed.
+This patching feature is specially useful when updating Entity Framework entities as it allows to atomically
+update only those properties that have really changed.
+
+
 
 ## Installation
 
