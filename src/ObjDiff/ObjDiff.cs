@@ -14,13 +14,13 @@ namespace ObjDiff
 {
     public static class ObjDiff
     {
-        public static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions = null) where T : class
+        public static IEnumerable<Difference<T>> Diff<T>(T left, T right, CompareOptions compareOptions = null) where T : class
         {
-            return Diff(left, right, compareOptions, null, null, 1);
+            return Diff<T>(left, right, compareOptions, null, null, 1);
         }
 
 
-        public static void Patch<T>(T target, IEnumerable<Difference> differences) where T : class
+        public static void Patch<T>(T target, IEnumerable<Difference<T>> differences) where T : class
         {
             foreach (var difference in differences)
             {
@@ -97,7 +97,6 @@ namespace ObjDiff
                     var collection = property.GetValue(objAux);
 
                     // For those collections implementing IList, missing/extra items can be directly added/deleted.
-
                     if (collection is IList list)
                     {
                         if (Equals(difference.LeftValue, ItemStatus.NotExist))
@@ -140,9 +139,9 @@ namespace ObjDiff
         }
 
 
-        private static IEnumerable<Difference> Diff<T>(T left, T right, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
+        private static IEnumerable<Difference<T>> Diff<T>(object left, object right, CompareOptions compareOptions, string path, int? arrayIndex, uint currentDepth) where T : class
         {
-            var differences = new List<Difference>();
+            var differences = new List<Difference<T>>();
 
             if ((left == null) && (right == null))
                 return differences;
@@ -208,7 +207,7 @@ namespace ObjDiff
                                 var rightCollectionValue = rightCollection.ElementAt(i);
 
                                 if (!Equals(leftCollectionValue, rightCollectionValue))
-                                    differences.Add(new Difference($"{propertyPath}[{i}]", leftCollectionValue, rightCollectionValue));
+                                    differences.Add(new Difference<T>($"{propertyPath}[{i}]", leftCollectionValue, rightCollectionValue));
                             }
                         }
                     }
@@ -218,7 +217,7 @@ namespace ObjDiff
                         if (compareOptions.CollectionsSameOrder)
                         {
                             for (int i = 0; i < minItems; i++)
-                                differences.AddRange(Diff(leftCollection.ElementAt(i), rightCollection.ElementAt(i), compareOptions, propertyPath, i, currentDepth + 1));
+                                differences.AddRange(Diff<T>(leftCollection.ElementAt(i), rightCollection.ElementAt(i), compareOptions, propertyPath, i, currentDepth + 1));
                         }
                     }
 
@@ -233,7 +232,7 @@ namespace ObjDiff
                                 for (int i = minItems; i < rightCollectionCount; i++)
                                 {
                                     var rightCollectionValue = rightCollection.ElementAt(i);
-                                    differences.Add(new Difference(propertyPath, ItemStatus.NotExist, rightCollectionValue));
+                                    differences.Add(new Difference<T>(propertyPath, ItemStatus.NotExist, rightCollectionValue));
                                 }
                             }
 
@@ -242,7 +241,7 @@ namespace ObjDiff
                                 for (int i = minItems; i < leftCollectionCount; i++)
                                 {
                                     var leftCollectionValue = leftCollection.ElementAt(i);
-                                    differences.Add(new Difference(propertyPath, leftCollectionValue, ItemStatus.NotExist));
+                                    differences.Add(new Difference<T>(propertyPath, leftCollectionValue, ItemStatus.NotExist));
                                 }
                             }
                         }
@@ -254,10 +253,10 @@ namespace ObjDiff
                         var rightCollectionExclusive = rightCollection.Except(leftCollection).ToList();
 
                         foreach (var item in leftCollectionExclusive)
-                            differences.Add(new Difference(propertyPath, item, ItemStatus.NotExist));
+                            differences.Add(new Difference<T>(propertyPath, item, ItemStatus.NotExist));
 
                         foreach (var item in rightCollectionExclusive)
-                            differences.Add(new Difference(propertyPath, ItemStatus.NotExist, item));
+                            differences.Add(new Difference<T>(propertyPath, ItemStatus.NotExist, item));
                     }
                 }
 
@@ -272,11 +271,11 @@ namespace ObjDiff
                         leftValue == null || rightValue == null)
                     {
                         if (!Equals(leftValue, rightValue))
-                            differences.Add(new Difference(propertyPath, leftValue, rightValue));
+                            differences.Add(new Difference<T>(propertyPath, leftValue, rightValue));
                     }
 
                     else
-                        differences.AddRange(Diff(leftValue, rightValue, compareOptions, propertyPath, arrayIndex, currentDepth + 1));
+                        differences.AddRange(Diff<T>(leftValue, rightValue, compareOptions, propertyPath, arrayIndex, currentDepth + 1));
                 }
             }
 

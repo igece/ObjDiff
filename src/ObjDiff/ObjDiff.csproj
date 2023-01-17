@@ -12,8 +12,8 @@
     <Authors>Israel Gómez de Celis González</Authors>
     <Description>A C# .NET Standard library that allows to obtain the differences between two objects and, optionally, patch the first object with these differences so it becomes equal to the second one.</Description>
     <Copyright>Copyright (c) 2021 Israel Gómez de Celis González</Copyright>
-    <Version>1.4.0</Version>
-    <PackageReleaseNotes>New compare option DontDiveProperties, to avoid diving on specified property names.\nNew method AreEqual and extension method IsEqualTo to check for two objects equality based on ObjDiff's Diff method results.\nBug fixes.</PackageReleaseNotes>
+    <Version>1.5.0</Version>
+    <PackageReleaseNotes>Use generics to ensure that a set of differences obtained from two instances of type A cannot be applied to an instance of type B (the compiler will complain).</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
